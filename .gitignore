@@ -1,3 +1,6 @@
 .vs
 __pycache__
 data
+dataset
+.vscode
+model.pth
