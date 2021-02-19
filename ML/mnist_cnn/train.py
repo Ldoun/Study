@@ -34,7 +34,7 @@ def get_model(config):
     if config.model == 'fc':
         model = FullyConnectedClassifier(28**2,10)
     elif config.model == 'cnn':
-        model = ConvolutionClassifier(10)
+        model = ConvolutionClassifier(10)   
     else:
         raise NotImplementedError('You need to specify model name.')
 
@@ -50,6 +50,7 @@ def main(config):
     print("Test:", len(test_loader.dataset))
 
     model = get_model(config).to(device)
+    print("gpu:",device)
     optimizer = optim.Adam(model.parameters())
     crit = nn.CrossEntropyLoss()
 

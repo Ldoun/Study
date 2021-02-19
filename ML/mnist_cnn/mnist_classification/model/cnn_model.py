@@ -43,7 +43,7 @@ class ConvolutionClassifier(nn.Module):
         )
 
     def forward(self, x):
-        assert x.dim() > 2
+        assert x.dim() > 2  
 
         if x.dim() == 3:
             x = x.view(-1, 1, x.size(-2), x.size(-1))
