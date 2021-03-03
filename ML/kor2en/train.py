@@ -207,6 +207,12 @@ def define_argparser(is_continue=False):
         default=8,
         help='Number of heads in multi-head attention in Transformer. Default=%(default)s',
     )
+    p.add_argument(
+        '--log_dir',
+        type=str,
+        required=False,
+        default='tensorboard_logs'
+    )
 
     config = p.parse_args()
 
@@ -293,7 +299,7 @@ def main(config, model_weight=None, opt_weight=None):
     loader = DataLoader(
         config.train,                           # Train file name except extention, which is language.
         config.valid,                           # Validation file name except extension.
-        (config.lang[:2], config.lang[-2:]),    # Source and target language.
+        (config.lang[:2], config.lang[-3:]),    # Source and target language.
         batch_size=config.batch_size,
         device=-1,                              # Lazy loading
         max_length=config.max_length,           # Loger sequence will be excluded.

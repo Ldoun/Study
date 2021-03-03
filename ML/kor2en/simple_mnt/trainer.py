@@ -41,27 +41,30 @@ class MaximumLikelihoodEstimationEngine(Engine):
         if engine.state.iteration % engine.config.iteration_per_update == 1 or engine.config.iteration_per_update == 1:
             engine.optimizer.zero_grad()
 
-        device = next(model.parameters()).device
+        device = next(engine.model.parameters()).device
         mini_batch.src = (mini_batch.src[0].to(device),mini_batch.src[1]) #tensor,length
         mini_batch.tgt = (mini_batch.tgt[0].to(device),mini_batch.tgt[1])
         
-        x,y = mini_batch.src,mini_batch.tgt[:,1:]  #<BOS> 제외 정답문장 1번 단어부터 비교
+        x,y = mini_batch.src,mini_batch.tgt[0][:,1:]  #<BOS> 제외 정답문장 1번 단어부터 비교
         #|x| = (batch_size,length)
         #|y| = (batch_size,length)
+        print(x[0].size())
+        print(y.size())
+
 
         with autocast():     
             y_hat = engine.model(x,mini_batch.tgt[0][:,:-1])
             #|y_hat| = (batch_size,length,ouput_size)
             loss = engine.crit(
-                y_hat.contiguous.view(-1,y_hat.size(-1)),
-                y.contiguous.view(-1)
+                y_hat.contiguous().view(-1,y_hat.size(-1)),
+                y.contiguous().view(-1)
             )
 
             backward_target = loss.div(y.size(0)).div(engine.config.iteration_per_update)
             loss.backward()
 
         if engine.config.gpu_id >=0:
-            engine.scaler.scale(backward_target).backward()
+            engine.scaler.scale(backward_target).backward(retain_graph=True)
         else:
             backward_target.backward()
         
@@ -105,6 +108,7 @@ class MaximumLikelihoodEstimationEngine(Engine):
             mini_batch.tgt = (mini_batch.tgt[0].to(device),mini_batch.tgt[1])
             
             x, y = mini_batch.src, mini_batch.tgt[:,1:]
+            print(x.size())
             #|x| = (batch_size,length)
             #|y| = (batch_size,length)
             

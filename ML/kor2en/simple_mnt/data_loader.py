@@ -55,17 +55,17 @@ class DataLoader():
                 max_length = max_length
             )
 
-            test = TranslationDataset(
+            '''test = TranslationDataset(
                 path = test_fn,
                 exts=exts,
                 fields=[('src',self.src),('tgt',self.tgt)],
                 max_length = max_length
-            )
+            )'''
 
             self.train_iter = data.BucketIterator(
                 train,
                 batch_size=batch_size,
-                device='cuda%d' % device if device >=0 else 'cpu',
+                device='cuda:%d' % device if device >=0 else 'cpu',
                 shuffle = shuffle,
                 sort_key= lambda x: len(x.tgt)+(max_length * len(x.src)),
                 sort_within_batch=True 

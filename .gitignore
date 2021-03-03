@@ -4,3 +4,4 @@ data
 dataset
 .vscode
 model.pth
+tensorboard_logs

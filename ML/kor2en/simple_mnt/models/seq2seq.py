@@ -4,11 +4,11 @@ from torch.nn.utils.rnn import pack_padded_sequence as pack
 from torch.nn.utils.rnn import pad_packed_sequence as unpack
 
 import simple_mnt.data_loader as data_loader
-from simple_mnt.search import SingleBeamSearchBoard
+#from simple_mnt.search import SingleBeamSearchBoard
 
 class Attention(nn.Module):
     def __init__(self,hidden_size):
-        super().__init__()
+        super(Attention, self).__init__()
 
         self.linear = nn.Linear(hidden_size,hidden_size,bias=False)
         self.softmax = nn.Softmax(dim=-1)
@@ -25,7 +25,7 @@ class Attention(nn.Module):
         #|weight| = (batch_size,length)
 
         if mask is not None:
-            weight.maked_fill_(mask,-float('inf'))
+            weight.masked_fill_(mask,-float('inf'))
         weight = self.softmax(weight)
         #현재 timestep에 영향을 많이 끼치는 timestep(단어)의 소프트맥스 확률이 크게 나타남
 
@@ -105,7 +105,7 @@ class Generator(nn.Module):
     def __init__(self,hidden_size,output_size):
         super().__init__()
 
-        self.output = nn.Linear(hidden_size,output_size = output_size) 
+        self.output = nn.Linear(hidden_size,out_features= output_size) 
         self.softmax = nn.Softmax(dim = -1) #cross-entrophy 사용
 
     def forward(self,x):
@@ -186,7 +186,7 @@ class Seq2Seq(nn.Module):
         return (new_hidden,new_cells)
 
     def fast_merge_encoder_hidden(self,encoder_hiddens):
-        h_0_tgt, c_0_tht = encoder_hiddens
+        h_0_tgt, c_0_tgt = encoder_hiddens
         batch_size = h_0_tgt.size(1)
 
         h_0_tgt = h_0_tgt.transpose(0,1).contiguous().view(batch_size,-1,self.hidden_size).transpose(0,1).contiguous()
@@ -248,7 +248,7 @@ class Seq2Seq(nn.Module):
         h_tilde = torch.cat(h_tilde,dim=1)
         #|h_t_tilde| = (batch_size,length,hidden_size)
 
-        y_hat = self.generator(h_t_tilde)
+        y_hat = self.generator(h_tilde)
         #|y_hat| = (batch_size,length,ouput_size)
 
         return y_hat
